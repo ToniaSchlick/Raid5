@@ -1,6 +1,6 @@
 # --------------------------------------------
 # Created on November 11 2018
-# @author: Tonia Schlcik and Jase Rost
+# @author: Tonia Schlick and Jase Rost
 # --------------------------------------------
 
 from bitarray import bitarray
