@@ -119,14 +119,16 @@ def main():
     L1 = tk.Label(intro, text="How many disks would you like to run?")
     L1.pack()
     E1 = tk.Entry(intro)
+    E1.focus_set()
     E1.pack()
-    B1 = tk.Button(intro, text="Continue", command=lambda: get_num_disks(E1, intro)).pack()
+    B1 = tk.Button(intro, text="Continue", command=lambda: get_num_disks(E1, intro))
+    B1.pack()
+    intro.bind('<Return>', (lambda e, B1=B1: B1.invoke()))
     intro.mainloop()
     intro.destroy()
 
     mainWin = tk.Tk()
     c = tk.Canvas(mainWin, height=500, width=600, bg="white")
-    #display_disks(c)
 
     labels = []
     block = c.create_polygon(150, 100, 250, 200, fill="blue")
