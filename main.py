@@ -4,6 +4,9 @@
 # --------------------------------------------
 
 from bitarray import bitarray
+import tkinter as tk
+from tkinter import messagebox
+import time
 
 testing = True
 
@@ -12,7 +15,7 @@ def test_log(message):
     if testing:
         print(message)
 
-
+global num_disks
 place_holder = 0
 disk1 = []
 disk2 = []
@@ -56,7 +59,16 @@ def print_disks():
             print(x)
         count += 1
 
-
+##def display_disks(canvas):
+##    global num_disks
+##    for x in range(0, len(driver)):
+##        width = 600/num_disks
+##        left_anchor = width * x
+##        for y in range(0, len(driver[x])):
+##            height = 500/len(driver[x])
+##            top_anchor = height * y
+##            canvas.create_polygon(left_anchor, top_anchor, left_anchor+width, top_anchor+height)
+            
 def kill_disk(disk):
     for x in range(len(disk)):
         disk[x-1] = []
@@ -78,18 +90,69 @@ def recover_disk(disk):
     for x in range(len(disk)):
         disk[x] = get_parity(bitarray(driver[index + 1][x]), bitarray(driver[index + 2][x]))
 
+def get_num_disks(entry, window):
+    global num_disks
+    num_disks = int(entry.get())
+    window.quit()
 
+def exit_window(window):
+    window.quit()
+
+def change_labels(labels):
+    for x in labels:
+        for y in x:
+            y.config(text="General Kenobi!")
+    
 def main():
     init_data()
-    print_disks()
-    print('\nkill disk 1')
-    kill_disk(disk1)
-    print_disks()
-    recover_disk(disk1)
-    print('\ndisk 1 recovered')
-    print_disks()
-    print_files()
+##    print_disks()
+##    print('\nkill disk 1')
+##    kill_disk(disk1)
+##    print_disks()
+##    recover_disk(disk1)
+##    print('\ndisk 1 recovered')
+##    print_disks()
+##    print_files()
 
+    global num_disks
+    intro = tk.Tk()
+    L1 = tk.Label(intro, text="How many disks would you like to run?")
+    L1.pack()
+    E1 = tk.Entry(intro)
+    E1.pack()
+    B1 = tk.Button(intro, text="Continue", command=lambda: get_num_disks(E1, intro)).pack()
+    intro.mainloop()
+    intro.destroy()
+
+    mainWin = tk.Tk()
+    c = tk.Canvas(mainWin, height=500, width=600, bg="white")
+    #display_disks(c)
+
+    labels = []
+    block = c.create_polygon(150, 100, 250, 200, fill="blue")
+    for x in range(0, len(driver)):
+        width = (600 - (5 * (num_disks + 1)))/num_disks
+        left_anchor = width * x
+        main_labels = []
+        for y in range(0, len(driver[x])):
+            height = (500 - (5 * (len(driver[x]) + 1)))/len(driver[x])
+            top_anchor = height * y + 15
+            c.create_rectangle(left_anchor+15, top_anchor, left_anchor+width, top_anchor+height, outline = "black")
+            l = tk.Label(mainWin, text="Hello there!")
+            l.place(x=left_anchor+30, y = top_anchor+40)
+            main_labels.append(l)
+        labels.append(main_labels)
+    
+    c.pack()
+    stop = tk.Button(mainWin, text="Quit", command=lambda: exit_window(mainWin)).pack(side=tk.RIGHT)
+    change = tk.Button(mainWin, text="Initialize", command=lambda: change_labels(labels)).pack(side=tk.RIGHT)
+
+    for x in range(0, num_disks):
+        label = "Disk " + str(x)
+        b = tk.Button(mainWin, text=label, command=lambda: kill_disk(driver[x]))
+        b.pack(side=tk.BOTTOM)
+
+    mainWin.mainloop()
 
 if __name__ == '__main__':
     main()
