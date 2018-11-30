@@ -78,9 +78,11 @@ def print_disks():
 ##            top_anchor = height * y
 ##            canvas.create_polygon(left_anchor, top_anchor, left_anchor+width, top_anchor+height)
             
-def kill_disk(disk):
-    for x in range(len(disk)):
-        disk[x-1] = []
+def kill_disk(disk, labels, num):
+    print(str(num))
+    for x in range(0, len(disk)):
+        disk[x] = 'X'
+        labels[x].config(text=disk[x])
 
 
 def init_data(labels):
@@ -137,24 +139,24 @@ def main():
     intro.destroy()
 
     mainWin = tk.Tk()
-    c = tk.Canvas(mainWin, height=500, width=600, bg="white")
+    c = tk.Canvas(mainWin, height=500, width=1000, bg="gray")
 
     labels = []
     for x in range(0, num_disks):
         main_labels = []
         for y in range(0, num_files):
-            main_labels.append(tk.Label(mainWin))
+            main_labels.append(tk.Label(mainWin, bg='white'))
         labels.append(main_labels)
         
-    block = c.create_polygon(150, 100, 250, 200, fill="blue")
+    #block = c.create_polygon(150, 100, 250, 200, fill="blue")
     for x in range(0, num_disks):
-        width = (600 - (5 * (num_disks + 1)))/num_disks
+        width = (1000 - (5 * (num_disks + 1)))/num_disks
         left_anchor = width * x
         #main_labels = []
         for y in range(0, num_files):
             height = (500 - (5 * (num_files + 1)))/num_files
             top_anchor = height * y + 15
-            c.create_rectangle(left_anchor+15, top_anchor, left_anchor+width, top_anchor+height, outline = "black")
+            c.create_rectangle(left_anchor+15, top_anchor, left_anchor+width, top_anchor+height, outline = "black", fill='white')
             #l = tk.Label(mainWin, text="Hello there!")
             #l.place(x=left_anchor+30, y = top_anchor+40)
             labels[x][y].config(text="Hello there!")
@@ -168,7 +170,7 @@ def main():
 
     for x in range(0, num_disks):
         label = "Disk " + str(x)
-        b = tk.Button(mainWin, text=label, command=lambda: kill_disk(driver[x]))
+        b = tk.Button(mainWin, text=label, command=lambda y=x: kill_disk(driver[y], labels[y], y))
         b.pack(side=tk.BOTTOM)
 
     mainWin.mainloop()
