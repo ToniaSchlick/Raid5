@@ -7,6 +7,7 @@ from bitarray import bitarray
 import tkinter as tk
 from tkinter import messagebox
 import time
+import re
 
 testing = True
 
@@ -16,6 +17,7 @@ def test_log(message):
         print(message)
 
 global num_disks
+num_files = 5
 place_holder = 0
 disk1 = []
 disk2 = []
@@ -28,7 +30,7 @@ def get_parity(a, b):
     return parity
 
 
-def save_data(data):
+def save_data(data, labels):
     global place_holder
     a = data[0:data.length()//2]    # first half
     b = data[data.length()//2:]     # second half
@@ -39,6 +41,13 @@ def save_data(data):
     driver[(place_holder + 2) % len(driver)].append(b)
     place_holder += 1
 
+    for x in range(0, len(driver)):
+        for y in range(0, len(driver[x])):
+            labels[x][y].config(text=display_bitarray(driver[x][y]))
+
+
+def display_bitarray(array):
+    return re.sub('[^0-9]+', '', str(array))
 
 def print_files():
     test_log('\nPrint Recovered Files')
@@ -74,7 +83,7 @@ def kill_disk(disk):
         disk[x-1] = []
 
 
-def init_data():
+def init_data(labels):
     files = ["file1", "file2", "file3", "file4", "file5"]
     for file in files:
         data = bitarray()
@@ -82,7 +91,7 @@ def init_data():
             data.fromfile(fh)
         test_log(file + ": " + (str(data)))
         test_log(file + ": " + data.tostring())
-        save_data(data)
+        save_data(data, labels)
 
 
 def recover_disk(disk):
@@ -104,7 +113,7 @@ def change_labels(labels):
             y.config(text="General Kenobi!")
     
 def main():
-    init_data()
+##    init_data()
 ##    print_disks()
 ##    print('\nkill disk 1')
 ##    kill_disk(disk1)
@@ -131,23 +140,31 @@ def main():
     c = tk.Canvas(mainWin, height=500, width=600, bg="white")
 
     labels = []
+    for x in range(0, num_disks):
+        main_labels = []
+        for y in range(0, num_files):
+            main_labels.append(tk.Label(mainWin))
+        labels.append(main_labels)
+        
     block = c.create_polygon(150, 100, 250, 200, fill="blue")
-    for x in range(0, len(driver)):
+    for x in range(0, num_disks):
         width = (600 - (5 * (num_disks + 1)))/num_disks
         left_anchor = width * x
-        main_labels = []
-        for y in range(0, len(driver[x])):
-            height = (500 - (5 * (len(driver[x]) + 1)))/len(driver[x])
+        #main_labels = []
+        for y in range(0, num_files):
+            height = (500 - (5 * (num_files + 1)))/num_files
             top_anchor = height * y + 15
             c.create_rectangle(left_anchor+15, top_anchor, left_anchor+width, top_anchor+height, outline = "black")
-            l = tk.Label(mainWin, text="Hello there!")
-            l.place(x=left_anchor+30, y = top_anchor+40)
-            main_labels.append(l)
-        labels.append(main_labels)
+            #l = tk.Label(mainWin, text="Hello there!")
+            #l.place(x=left_anchor+30, y = top_anchor+40)
+            labels[x][y].config(text="Hello there!")
+            labels[x][y].place(x=left_anchor+30, y = top_anchor+40)
+            #main_labels.append(l)
+        #labels.append(main_labels)
     
     c.pack()
     stop = tk.Button(mainWin, text="Quit", command=lambda: exit_window(mainWin)).pack(side=tk.RIGHT)
-    change = tk.Button(mainWin, text="Initialize", command=lambda: change_labels(labels)).pack(side=tk.RIGHT)
+    change = tk.Button(mainWin, text="Initialize", command=lambda: init_data(labels)).pack(side=tk.RIGHT)
 
     for x in range(0, num_disks):
         label = "Disk " + str(x)
