@@ -15,29 +15,40 @@ def test_log(message):
     if testing:
         print(message)
 
-global num_disks
+num_disks = 10
 place_holder = 0
-disk1 = []
-disk2 = []
-disk3 = []
-driver = [disk1, disk2, disk3]
+# disk1 = []
+# disk2 = []
+# disk3 = []
+driver = []
 
 
-def get_parity(a, b):
-    parity = a ^ b
+def get_parity(bitarrays):
+    parity = bitarrays[0]
+    for x in range(1, len(bitarrays)):
+        parity = parity ^ bitarrays[x]
     return parity
 
 
 def save_data(data):
     global place_holder
-    a = data[0:data.length()//2]    # first half
-    b = data[data.length()//2:]     # second half
-    c = get_parity(a, b)            # parity bit
+    global num_disks
+    array_length = len(data)//(num_disks-1)
+    bitarrays = []
+    for x in range(0, num_disks-1):
+        place_holder += 1
+        bit_slice = data[(x*array_length): (x * array_length + array_length)]
+        driver[(place_holder) % num_disks].append([bit_slice])
+        # driver.append(['data[%s,%s]' % (x * array_length, (x * array_length + array_length))])
+        bitarrays.append(bit_slice)
 
-    driver[place_holder % len(driver)].append(c)
-    driver[(place_holder + 1) % len(driver)].append(a)
-    driver[(place_holder + 2) % len(driver)].append(b)
-    place_holder += 1
+
+    parity = get_parity(bitarrays)            # parity bit
+    print(place_holder)
+    driver[(place_holder+1)% num_disks].append(parity)
+    # driver[(place_holder + 1) % len(driver)].append(a)
+    # driver[(place_holder + 2) % len(driver)].append(b)
+    # place_holder += 1
 
 
 def print_files():
@@ -90,10 +101,17 @@ def recover_disk(disk):
     for x in range(len(disk)):
         disk[x] = get_parity(bitarray(driver[index + 1][x]), bitarray(driver[index + 2][x]))
 
+
+
+
 def get_num_disks(entry, window):
     global num_disks
     num_disks = int(entry.get())
+    for x in range(0, num_disks):
+        driver.append([])
     window.quit()
+    init_data()
+    print_disks()
 
 def exit_window(window):
     window.quit()
@@ -104,7 +122,7 @@ def change_labels(labels):
             y.config(text="General Kenobi!")
     
 def main():
-    init_data()
+
 ##    print_disks()
 ##    print('\nkill disk 1')
 ##    kill_disk(disk1)
@@ -122,6 +140,7 @@ def main():
     E1.focus_set()
     E1.pack()
     B1 = tk.Button(intro, text="Continue", command=lambda: get_num_disks(E1, intro))
+
     B1.pack()
     intro.bind('<Return>', (lambda e, B1=B1: B1.invoke()))
     intro.mainloop()
