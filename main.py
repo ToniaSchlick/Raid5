@@ -43,7 +43,8 @@ def save_data(data, labels):
 
     for x in range(0, len(driver)):
         for y in range(0, len(driver[x])):
-            labels[x][y].config(text=display_bitarray(driver[x][y]))
+            tag = labels[x][y]
+            tag.config(text=display_bitarray(driver[x][y]))
 
 
 def display_bitarray(array):
@@ -166,7 +167,7 @@ def main():
     
     c.pack()
     stop = tk.Button(mainWin, text="Quit", command=lambda: exit_window(mainWin)).pack(side=tk.RIGHT)
-    change = tk.Button(mainWin, text="Initialize", command=lambda: init_data(labels)).pack(side=tk.RIGHT)
+    change = tk.Button(mainWin, text="Initialize", command=lambda tags=labels: init_data(tags)).pack(side=tk.RIGHT)
 
     for x in range(0, num_disks):
         label = "Disk " + str(x)
