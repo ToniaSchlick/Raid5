@@ -12,11 +12,9 @@ import math
 
 testing = True
 
-
 def test_log(message):
     if testing:
         print(message)
-
 
 global num_disks
 bit_slices = []
@@ -97,15 +95,37 @@ def print_disks():
             print(x)
         count += 1
 
-##def display_disks(canvas):
-##    global num_disks
-##    for x in range(0, len(driver)):
-##        width = 600/num_disks
-##        left_anchor = width * x
-##        for y in range(0, len(driver[x])):
-##            height = 500/len(driver[x])
-##            top_anchor = height * y
-##            canvas.create_polygon(left_anchor, top_anchor, left_anchor+width, top_anchor+height)
+pos = 0
+def getNextBlock():
+    global pos
+    if pos % (num_disks-1) == 0 and pos is not 0:
+        print(pos)
+        pos += 1
+    block = driver[pos % num_disks][math.floor(pos / num_disks)]
+    pos += 1
+    if block[0] == 'X':
+        return [False, False, False, False]
+    return block[0]
+
+
+def write_files():
+    global pos
+    global files
+    global num_files
+    pos = 0
+    parts = 4
+    for x in range(num_files):
+        bit_arr = bitarray()
+        for y in range(parts):
+            bit_arr.extend(getNextBlock())
+
+        with open(files[x], 'w') as text_file:
+            print(bit_arr)
+            try:
+                print(bit_arr.tostring())
+                text_file.write(bit_arr.tostring())
+            except:
+                text_file.write((str(bit_arr[0])))
 
 
 def kill_disk(disk, labels, num):
@@ -115,12 +135,14 @@ def kill_disk(disk, labels, num):
     for x in range(0, len(disk)):
         disk[x] = 'X'
         labels[x].config(text=disk[x])
+    write_files()
 
+files = ["file1", "file2", "file3", "file4", "file5"]
 
 def init_data(labels):
     global p_location
+    global files
     p_location = num_disks - 1
-    files = ["file1", "file2", "file3", "file4", "file5"]
     for x in range(0, len(files)):
         data = bitarray()
         with open(files[x], 'rb') as fh:
@@ -149,12 +171,12 @@ def recover_disk(labels):
                 bits.append(new_slice[0])
         get_parity(bits, lost_index)
         print(driver[lost_index])
-
     for y in range(0, len(driver[lost_index])):
         for x in range(0, len(driver)):
             labels[lost_index][y].config(text=display_bitarray(driver[lost_index][y]))
-
     corrupted_disk = None
+    write_files()
+
 
 def get_num_disks(entry, window):
     global num_disks
